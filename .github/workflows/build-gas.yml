@@ -1,0 +1,20 @@
+name: Build standalone game
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m py_compile build_gas.py
+      - run: python3 build_gas.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: standalone-game
+          path: dist/index.html
+          if-no-files-found: error
