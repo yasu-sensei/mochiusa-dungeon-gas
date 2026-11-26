@@ -1,3 +1,16 @@
+function gameMessage(title,body,ok='わかった！',cancel=''){
+ return new Promise(resolve=>{
+ const layer=document.createElement('div');layer.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#071322bb;display:grid;place-items:center;padding:16px;box-sizing:border-box';
+ const card=document.createElement('section');card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.style.cssText='box-sizing:border-box;width:min(100%,480px);max-height:90vh;overflow:auto;background:#20334e;border:3px solid #d8b45e;border-radius:20px;padding:22px;color:white;text-align:center;box-shadow:0 12px 40px #0008';
+ const h=document.createElement('h2');h.textContent=title;h.style.cssText='margin:0 0 16px;color:#f4d78a;font-size:clamp(18px,4vw,28px)';
+ const p=document.createElement('div');p.textContent=body;p.style.cssText='white-space:pre-line;font-size:clamp(16px,3vw,23px);line-height:1.6';
+ const row=document.createElement('div');row.style.cssText='display:flex;gap:12px;margin-top:20px;justify-content:center';
+ const prior=document.activeElement;function done(v){layer.remove();prior?.focus();resolve(v)}
+ function button(label,v){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='flex:1;margin:0;padding:12px 6px;border:0;border-radius:10px;font-weight:900;font-size:clamp(16px,3vw,22px);background:'+(v?'#e5c578;color:#392a10':'#45566e;color:white');b.onclick=()=>done(v);row.append(b);return b}
+ if(cancel)button(cancel,false);const yes=button(ok,true);card.append(h,p,row);layer.append(card);document.body.append(layer);yes.focus();
+ layer.addEventListener('keydown',e=>{if(e.key==='Escape'&&cancel){e.preventDefault();done(false)}if(e.key==='Tab'){e.preventDefault();const bs=[...row.querySelectorAll('button')];bs[(bs.indexOf(document.activeElement)+1)%bs.length].focus()}});
+ });
+}
 
 const sprites={"0_0": "images/d53232930153cc8f.webp", "1_0": "images/f5dcbe15f535a4df.webp", "2_0": "images/bb3db842589154ec.webp", "3_0": "images/b55a6d9923b5e164.webp", "0_1": "images/730627ffc9482751.webp", "1_1": "images/09cf6c5b24dd376d.webp", "2_1": "images/3b0c448009ba91e7.webp", "3_1": "images/897f4e9810605dfa.webp", "0_2": "images/debc4eea12212ab4.webp", "1_2": "images/c0034a1b1a4ef1c9.webp", "2_2": "images/434981431e8e88d7.webp", "3_2": "images/55db315f32922f5a.webp"};
 const N=10, TOTAL=100, KEY='mochiusa_underground_B1_prototype_10x10_v1';
@@ -29,12 +42,12 @@ if(!tutorialActive&&validFloor(priorFloor)&&priorFloor._sharedAt>(state._sharedA
 x=state.x;y=state.y;
 const icons={item:'',monster:'👾',wood:'‼️',emptywood:'‼️',mimic:'‼️',silver:'‼️',gold:'‼️',stairs:'🌀',special:'💎',empty:''};const cells=[];
 function save(){updateFloorLabel();if(tutorialActive&&currentFloor===1)return;state._sharedAt=Date.now();localStorage.setItem(floorKey(currentFloor),JSON.stringify(state));if(!tutorialActive)localStorage.setItem(FLOOR_ACTIVE_KEY,String(currentFloor));updateFloorLabel();}function updateFloorLabel(){const label=document.getElementById('floorLabel');if(label)label.textContent='地下'+currentFloor+'階';const back=document.getElementById('backFloor1');if(back)back.style.display=(currentFloor>1||tutorialActive&&currentFloor===1)?'block':'none';}
-function finishCoreTutorial(){localStorage.setItem(tutorialDone,'1');localStorage.removeItem(tutorialPhaseKey);localStorage.setItem('mochiusa_medal_00','1');if(!localStorage.getItem(KEY)){localStorage.setItem(FLOOR_ACTIVE_KEY,'1');localStorage.setItem('mochiusa_tutorial_bonus_pending','1');}moving=true;alert('🎉 チュートリアル クリア！\nタイトルから ぼうけんを はじめよう！');parent.__returnToTitle();}
+async function finishCoreTutorial(){localStorage.setItem(tutorialDone,'1');localStorage.removeItem(tutorialPhaseKey);localStorage.setItem('mochiusa_medal_00','1');if(!localStorage.getItem(KEY)){localStorage.setItem(FLOOR_ACTIVE_KEY,'1');localStorage.setItem('mochiusa_tutorial_bonus_pending','1');}moving=true;await gameMessage('🎉 チュートリアル クリア！','タイトルから ぼうけんを はじめよう！','タイトルへ');parent.__returnToTitle();}
 function floorTreasureFound(f){const st=f===currentFloor?state:readFloor(f);return validFloor(st)&&st.found.some(i=>st.types[i]==='special');}
 function missingGateTreasures(next){if(tutorialActive||parent.__teacherMode||next<=currentFloor||![11,21,31].includes(next))return [];return Array.from({length:next-1},(_,i)=>i+1).filter(f=>!floorTreasureFound(f));}
 function moveFloor(next){
  if(next<0||next>17||next===0&&!tutorialActive)return;
- const missing=missingGateTreasures(next);if(missing.length){alert('🔒 まだ さきには すすめないよ！\nちか'+next+'かいに すすむには おたからを '+(next-1)+'こ あつめよう！\n💎 '+(next-1-missing.length)+' / '+(next-1)+'\nまだのおたから：ちか '+missing.join('・')+'かい\nまえの かいに もどって さがしてこよう！');return;}
+ const missing=missingGateTreasures(next);if(missing.length){gameMessage('🔒 まだ さきには すすめないよ！','ちか'+next+'かいに すすむには おたからを '+(next-1)+'こ あつめよう！\n💎 '+(next-1-missing.length)+' / '+(next-1)+'\nまだのおたから：ちか '+missing.join('・')+'かい\nまえの かいに もどって さがしてこよう！');return;}
  if(tutorialActive){
  if(currentFloor===1&&next===0){finishCoreTutorial();return;}
  if(currentFloor===0&&next===1&&tutorialPhase===2){finishCoreTutorial();return;}
@@ -247,7 +260,7 @@ else if(type==='monster'){chiteiEncounterMonster=chiteiMonsterForCell(i);label='
 else if(type==='special'&&typeof window.chiteiAwardTreasure==='function'){addHistory('💎 おたからを はっけん！')}else{const messages={stairs:'🌀 ワープゲートを はっけん！',special:'💎 おたからを はっけん！'};label=messages[type]||'✨ なにかを はっけん！';addHistory(label);await showEvent(label,true)}
 render();return true}
 function showPickStudyGuide(){if(parent.__teacherMode&&!tutorialActive||document.getElementById('pickStudyGuide'))return;const d=document.createElement('dialog');d.id='pickStudyGuide';d.style.cssText='width:min(90vw,480px);border:2px solid #dfb96d;border-radius:18px;background:#172b46;color:#ffe6a5;text-align:center;padding:24px';const h=document.createElement('h2');h.textContent='⛏️ つるはしが なくなったよ！';const p=document.createElement('p');p.textContent='べんきょうを して、つるはしを ゲットしよう！';p.style.fontSize='20px';const go=document.createElement('button'),close=document.createElement('button');go.textContent='📖 べんきょうする';close.textContent='とじる';for(const b of [go,close])b.style.cssText='padding:12px;margin:6px;border-radius:10px;font-size:18px;font-weight:bold';go.style.background='#dfb96d';go.onclick=()=>{d.close();document.getElementById('openStudy')?.click()};close.onclick=()=>d.close();d.addEventListener('close',()=>d.remove(),{once:true});d.append(h,p,go,close);document.body.append(d);d.showModal()}
-async function select(i){if(moving)return;if(tutorialActive){if(currentFloor===1)return;const target=tutorialTarget();if(i!==target){tutorialHint();return;}}const nx=i%N,ny=Math.floor(i/N),open=state.open.includes(i);if(nx===x&&ny===y){if(tutorialActive&&i===36&&confirm('つぎの かいに いく？')){moveFloor(1);tutorialHint()}return;}
+async function select(i){if(moving)return;if(tutorialActive){if(currentFloor===1)return;const target=tutorialTarget();if(i!==target){tutorialHint();return;}}const nx=i%N,ny=Math.floor(i/N),open=state.open.includes(i);if(nx===x&&ny===y){if(tutorialActive&&i===36){moving=true;try{if(await gameMessage('🌀 ワープゲート','ちか1かいに すすむ？','すすむ！','やめる')){moveFloor(1);tutorialHint()}}finally{moving=false}}return;}
 if(!open&&!isNear(nx,ny)){msg.textContent='まだ ほっていないマスは、となりだけ ほれるよ';return}
 if(!parent.__teacherMode&&!open&&(state.pick||0)<=0){msg.textContent='⛏️ つるはしが たりないよ！ べんきょうして ふやそう！';showPickStudyGuide();return}
 const path=open?findPath(i):[idx(x,y),i];if(!path){msg.textContent='そこへ いく みちが まだ つながっていないよ';return}
@@ -255,7 +268,7 @@ const startFloor=currentFloor;moving=true;activeTarget=i;render();if(!open){dir=
 for(let k=1;k<path.length;k++){const dest=path[k],tx=dest%N,ty=Math.floor(dest/N);dir=tx>x?1:tx<x?3:ty>y?0:2;await hop(tx,ty);render();if(await discover(dest)){render()}
 // 階段は発見済みでも、到着するたびに次の階への移動を確認する。
 if(state.types[dest]==='stairs'){
- const goNext=confirm('🌀 ワープゲートに ついたよ！\nつぎの かいに いく？');
+ const goNext=await gameMessage('🌀 ワープゲート','ちか'+(currentFloor+1)+'かいに すすむ？','すすむ！','やめる');
  if(goNext){if(currentFloor<17)moveFloor(currentFloor+1);else msg.textContent='🌀 ちか18かいは まだ じゅんびちゅうだよ。';}
  else{msg.textContent='🐰 この かいを もうすこし たんけんしよう！';}
  break;
