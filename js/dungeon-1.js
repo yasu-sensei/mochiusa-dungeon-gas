@@ -29,7 +29,7 @@ if(!tutorialActive&&validFloor(priorFloor)&&priorFloor._sharedAt>(state._sharedA
 x=state.x;y=state.y;
 const icons={item:'',monster:'👾',wood:'‼️',emptywood:'‼️',mimic:'‼️',silver:'‼️',gold:'‼️',stairs:'🌀',special:'💎',empty:''};const cells=[];
 function save(){updateFloorLabel();if(tutorialActive&&currentFloor===1)return;state._sharedAt=Date.now();localStorage.setItem(floorKey(currentFloor),JSON.stringify(state));if(!tutorialActive)localStorage.setItem(FLOOR_ACTIVE_KEY,String(currentFloor));updateFloorLabel();}function updateFloorLabel(){const label=document.getElementById('floorLabel');if(label)label.textContent='地下'+currentFloor+'階';const back=document.getElementById('backFloor1');if(back)back.style.display=(currentFloor>1||tutorialActive&&currentFloor===1)?'block':'none';}
-function finishCoreTutorial(){localStorage.setItem(tutorialDone,'1');localStorage.removeItem(tutorialPhaseKey);localStorage.setItem('mochiusa_medal_00','1');if(!localStorage.getItem(KEY)){localStorage.setItem(FLOOR_ACTIVE_KEY,'1');localStorage.setItem('mochiusa_tutorial_bonus_pending','1');}moving=true;alert('🎉 チュートリアル クリア！\nタイトルから ぼうけんを はじめよう！');parent.location.reload();}
+function finishCoreTutorial(){localStorage.setItem(tutorialDone,'1');localStorage.removeItem(tutorialPhaseKey);localStorage.setItem('mochiusa_medal_00','1');if(!localStorage.getItem(KEY)){localStorage.setItem(FLOOR_ACTIVE_KEY,'1');localStorage.setItem('mochiusa_tutorial_bonus_pending','1');}moving=true;alert('🎉 チュートリアル クリア！\nタイトルから ぼうけんを はじめよう！');parent.__returnToTitle();}
 function moveFloor(next){
  if(next<0||next>17||next===0&&!tutorialActive)return;
  if(tutorialActive){
