@@ -2,7 +2,7 @@ name: Build standalone game
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,3 +18,12 @@ jobs:
           name: standalone-game
           path: dist/index.html
           if-no-files-found: error
+      - name: Save standalone release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f dist/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Update standalone game release"
+            git push origin HEAD:main
+          fi
