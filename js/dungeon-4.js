@@ -58,7 +58,7 @@ function refresh(){
 }
 function start(mode,automatic=false){
  if(active||closingStudy||moving)return;if(tutorialActive&&(currentFloor!==0||!state.open.includes(56)||state.tutorialStudy?.[mode]))return;
- const d=read();if(!tutorialActive&&!parent.__teacherMode&&d[mode]>=4){alert('きょうは もう 4かい べんきょうしたよ！');return;}
+ const d=read();if(!tutorialActive&&!parent.__teacherMode&&d[mode]>=4){gameMessage('📚 きょうの べんきょう おしまい','きょうは もう 4かい べんきょうしたよ！\nまた あした がんばろう！');return;}
 
  if(!tutorialActive&&!parent.__teacherMode){d[mode]++;persist(d);}
  active={mode,finished:false};document.getElementById('studyTitle').textContent=tutorialActive?title[mode].replace('7','3'):title[mode];
