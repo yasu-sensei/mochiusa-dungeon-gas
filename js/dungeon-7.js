@@ -49,4 +49,4 @@
  refresh();frame(0);
 })();
 
-(function(){const panel=document.getElementById('dungeonActionPanel');if(!panel||document.getElementById('backTitle'))return;const b=document.createElement('button');b.type='button';b.id='backTitle';b.textContent='🏠 タイトルへ';panel.append(b);b.addEventListener('click',()=>{if(moving)return;if(!confirm('タイトルがめんに もどる？'))return;save();window.parent.location.reload()});if(typeof fitBoard==='function')fitBoard()})();
+(function(){const panel=document.getElementById('dungeonActionPanel');if(!panel||document.getElementById('backTitle'))return;const b=document.createElement('button');b.type='button';b.id='backTitle';b.textContent='🏠 タイトルへ';panel.append(b);b.addEventListener('click',()=>{if(moving)return;if(!confirm('タイトルがめんに もどる？'))return;save();parent.__returnToTitle()});if(typeof fitBoard==='function')fitBoard()})();
