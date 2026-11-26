@@ -33,7 +33,7 @@ const pick=document.getElementById('pick');if(pick)new MutationObserver(update).
 const floorLabel=document.createElement('strong');floorLabel.id='floorLabel';floorLabel.style.cssText='display:inline-block;margin:5px 0 8px;padding:6px 13px;border-radius:10px;background:#4d3d26;color:#ffe3a6;font-size:19px';
 const title=document.querySelector('h1');if(title)title.insertAdjacentElement('afterend',floorLabel);
 const backFloor1=document.createElement('button');backFloor1.id='backFloor1';backFloor1.textContent='🌀 ひとつ うえの かいに もどる';backFloor1.style.cssText='display:block;margin:10px 0;padding:10px 14px;background:#dfb96d;border:0;border-radius:10px;color:#172237;font-weight:bold;cursor:pointer';
-backFloor1.addEventListener('click',()=>{if(moving)return;if(confirm('ひとつ うえの かいに もどる？'))moveFloor(currentFloor-1)});
+backFloor1.addEventListener('click',async()=>{if(moving)return;moving=true;try{if(await gameMessage('🌀 ワープゲート','ちか'+(currentFloor-1)+'かいに もどる？','もどる！','やめる'))moveFloor(currentFloor-1)}finally{moving=false}});
 if(title)floorLabel.insertAdjacentElement('afterend',backFloor1);
 updateFloorLabel();if(tutorialActive)tutorialHint();
 window.addEventListener('resize',()=>{if(typeof fitBoard==='function')fitBoard()});
