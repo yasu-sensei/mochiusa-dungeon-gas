@@ -59,13 +59,13 @@ bootstrap = r"""
 """
 html=(root/"index.html").read_text(encoding="utf-8")
 def images(s):
-    return re.sub(r"images/[\w.-]+\.(?:webp|png|jpg|jpeg|gif|svg)",lambda m:assets.get(m.group(),m.group()),s,flags=re.I)
+    return re.sub(r"(?:\.\./)?images/[\w.-]+\.(?:webp|png|jpg|jpeg|gif|svg)",lambda m:assets.get(m.group().removeprefix("../"),m.group()),s,flags=re.I)
 def script(m):
     a,path,b=m.groups()
     return "<script"+a+b+">"+images(scripts[path]).replace("</script","<\\/script")+"</script>"
 html=re.sub(r'<script\b([^>]*?)\bsrc=["\'](js/[^"\']+)["\']([^>]*)>\s*</script>',script,html,flags=re.I)
 def css(m):
-    return "<style>"+images((root/m.group(1)).read_text(encoding="utf-8"))+"</style>"
+    return ("<style id=\"mochiusa-title-style\">" if m.group(1)=="css/title-2.css" else "<style>")+images((root/m.group(1)).read_text(encoding="utf-8"))+"</style>"
 html=re.sub(r'<link\b[^>]*href=["\'](css/[^"\']+)["\'][^>]*>',css,html,flags=re.I)
 payload="<script>window.__releasePack="+safe_json({"scripts":scripts,"assets":assets})+";"+bootstrap+"</script>"
 html=html.replace("</head>",payload+"</head>",1)
