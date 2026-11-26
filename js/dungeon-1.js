@@ -30,8 +30,11 @@ x=state.x;y=state.y;
 const icons={item:'',monster:'👾',wood:'‼️',emptywood:'‼️',mimic:'‼️',silver:'‼️',gold:'‼️',stairs:'🌀',special:'💎',empty:''};const cells=[];
 function save(){updateFloorLabel();if(tutorialActive&&currentFloor===1)return;state._sharedAt=Date.now();localStorage.setItem(floorKey(currentFloor),JSON.stringify(state));if(!tutorialActive)localStorage.setItem(FLOOR_ACTIVE_KEY,String(currentFloor));updateFloorLabel();}function updateFloorLabel(){const label=document.getElementById('floorLabel');if(label)label.textContent='地下'+currentFloor+'階';const back=document.getElementById('backFloor1');if(back)back.style.display=(currentFloor>1||tutorialActive&&currentFloor===1)?'block':'none';}
 function finishCoreTutorial(){localStorage.setItem(tutorialDone,'1');localStorage.removeItem(tutorialPhaseKey);localStorage.setItem('mochiusa_medal_00','1');if(!localStorage.getItem(KEY)){localStorage.setItem(FLOOR_ACTIVE_KEY,'1');localStorage.setItem('mochiusa_tutorial_bonus_pending','1');}moving=true;alert('🎉 チュートリアル クリア！\nタイトルから ぼうけんを はじめよう！');parent.__returnToTitle();}
+function floorTreasureFound(f){const st=f===currentFloor?state:readFloor(f);return validFloor(st)&&st.found.some(i=>st.types[i]==='special');}
+function missingGateTreasures(next){if(tutorialActive||parent.__teacherMode||next<=currentFloor||![11,21,31].includes(next))return [];return Array.from({length:next-1},(_,i)=>i+1).filter(f=>!floorTreasureFound(f));}
 function moveFloor(next){
  if(next<0||next>17||next===0&&!tutorialActive)return;
+ const missing=missingGateTreasures(next);if(missing.length){alert('🔒 まだ さきには すすめないよ！\nちか'+next+'かいに すすむには おたからを '+(next-1)+'こ あつめよう！\n💎 '+(next-1-missing.length)+' / '+(next-1)+'\nまだのおたから：ちか '+missing.join('・')+'かい\nまえの かいに もどって さがしてこよう！');return;}
  if(tutorialActive){
  if(currentFloor===1&&next===0){finishCoreTutorial();return;}
  if(currentFloor===0&&next===1&&tutorialPhase===2){finishCoreTutorial();return;}
