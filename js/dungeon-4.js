@@ -61,13 +61,13 @@ function start(mode,automatic=false){
  const d=read();if(!tutorialActive&&!parent.__teacherMode&&d[mode]>=4){gameMessage('📚 きょうの べんきょう おしまい','きょうは もう 4かい べんきょうしたよ！\nまた あした がんばろう！');return;}
 
  if(!tutorialActive&&!parent.__teacherMode){d[mode]++;persist(d);}
- active={mode,finished:false};document.getElementById('studyTitle').textContent=tutorialActive?title[mode].replace('7','3'):title[mode];
+ active={mode,finished:false};const closeButton=document.getElementById('studyClose');closeButton.disabled=true;closeButton.textContent='🔒 とじる';closeButton.style.opacity='0.45';document.getElementById('studyTitle').textContent=tutorialActive?title[mode].replace('7','3'):title[mode];
  document.getElementById('studyProgress').textContent=tutorialActive?'れんしゅう 3もん':parent.__teacherMode?'むせいげんモード':'きょうの '+d[mode]+'/4かいめ';
  frame.srcdoc=lessonPresentation(tutorialActive?LESSONS[mode].replace(/questions=makeSet\(\)/g,'questions='+JSON.stringify(mode==='kanji'?[{word:'一年',reading:'いちねん',mode:'input'},{word:'上がる',reading:'あがる',mode:'input'},{word:'三つ',reading:'みっつ',mode:'input'}]:[{word:'ネコ',mode:'anagram'},{word:'バス',mode:'anagram'},{word:'テレビ',mode:'anagram'}])+'').replace(/index>=7/g,'index>=3').replace(/index===7/g,'index===3').replace(/total:7/g,'total:3').replace(/7もん/g,'3もん').replace(/correct>=5\?correct:correct>=3\?4:3/g,'2'):LESSONS[mode],mode,tutorialActive);document.getElementById('dungeonModal')?.classList.remove('active');overlay.classList.add('active');refresh();
 }
 let closingStudy=false;
 function close(){
- if(!active||closingStudy)return;
+ if(!active||closingStudy||!active.finished)return;
 
  // Close the overlay first. Destroy the old lesson document on the next frame
  // so its pending timers/DOM events cannot block the main game UI.
@@ -91,6 +91,7 @@ window.addEventListener('message',event=>{
  if(tutorialActive){state.tutorialStudy=state.tutorialStudy||{};state.tutorialStudy[d.mode]=true;}const gained=tutorialActive?2:award(d.correct);state.pick+=gained;save();render();
  msg.textContent=`🎉 ${d.correct}/${d.total}もん せいかい！ つるはしを ${gained}ほん ゲット！`;
  document.getElementById('studyProgress').textContent=`${d.correct}/${d.total}もん　⛏️ +${gained}ほん`;
+ const closeButton=document.getElementById('studyClose');closeButton.disabled=false;closeButton.textContent='とじる';closeButton.style.opacity='';
  refresh();
 });
 refresh();
